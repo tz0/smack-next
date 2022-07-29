@@ -4668,6 +4668,28 @@ static int smack_inode_copy_up_xattr(const char *name)
 	return -EOPNOTSUPP;
 }
 
+/**
+ * smack_dentry_init_security - compute smack context for a dentry
+ * 				when inode is not yet available
+ * @dentry: the newly created directory entry
+ * @mode: determines resource type
+ * @name: name of the last path compoent used to create file
+ * @xattr_name: extended attributes value identified by name for dentry
+ * @ctx: pointer for the resulting context
+ * @ctxlen: point to place the length of the resulting context
+ * return -EOPNOTSUPP when no security attribute is needed/used.
+ */
+static int smack_dentry_init_security(struct dentry *dentry, int mode,
+					const struct qstr *name,
+					const char **xattr_name,
+					void **ctx, u32 *ctxlen)
+{
+	if (xattr_name)
+		*xattr_name = XATTR_SMACK_SUFFIX;
+
+	return -EOPNOTSUPP;
+}
+
 static int smack_dentry_create_files_as(struct dentry *dentry, int mode,
 					struct qstr *name,
 					const struct cred *old,
@@ -4901,6 +4923,7 @@ static struct security_hook_list smack_hooks[] __lsm_ro_after_init = {
 	LSM_HOOK_INIT(inode_getsecctx, smack_inode_getsecctx),
 	LSM_HOOK_INIT(inode_copy_up, smack_inode_copy_up),
 	LSM_HOOK_INIT(inode_copy_up_xattr, smack_inode_copy_up_xattr),
+	LSM_HOOK_INIT(dentry_init_security, smack_dentry_init_security),
 	LSM_HOOK_INIT(dentry_create_files_as, smack_dentry_create_files_as),
 #ifdef CONFIG_IO_URING
 	LSM_HOOK_INIT(uring_override_creds, smack_uring_override_creds),
